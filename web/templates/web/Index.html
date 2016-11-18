@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'jquery-2.2.0.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+</head>
+<body>
+    <div class="container">
+        <br>
+        <br>
+        <br>
+        <h2 align="center">欢迎</h2>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="row" style="height: 500px; ">
+            <div class="col-md-4" style="height: 200px"></div>
+            <div class="col-md-4" style="height: 500px;">
+                <br><br>
+                <div align="center">
+                    <button class="btn btn-default" style="width: 200px">
+                        <a href="{% url 'login' %}">登录</a>
+                    </button>
+                    <br>
+                    <br>
+                    <br>
+                    <button class="btn btn-default" style="width: 200px">
+                        <a href="{% url 'regist' %}">注册</a>
+                    </button>
+                    <br>
+                </div>
+            </div>
+            <div class="col-md-4" style="height: 500px"></div>
+        </div>
+
+    </div>
+</body>
+</html>

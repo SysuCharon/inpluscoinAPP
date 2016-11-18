@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1 align="center">For Test</h1>
+    <br>
+    <br>
+    <br>
+    <hr>
+    <div  style="height:200px; width:800px; ">
+        <h2>API #1 Time cost test:</h2>
+        <form>
+            {% csrf_token %}
+            <input type="button" value="Test" id="1" class="test">
+            <br>
+            <p>Costs: <span id="cost1_time"></span>s</p>
+            <p>addr: <span id="cost1_content"></span></p>
+
+            <br>
+        </form>
+    </div>
+    <br>
+    <hr>
+    <div  style="height:200px; width:800px; ">
+        <h2>API #2 Time cost test:</h2>
+        <form>
+            {% csrf_token %}
+            <input type="button" value="Test" id="2" class="test">
+            <br>
+            <p>Costs: <span id="cost2"></span>s</p>
+            <p>Costs: <span id="cost2_content"></span>s</p>
+            <br>
+        </form>
+    </div>
+    <br>
+    <hr>
+    <div  style="height:200px; width:800px; ">
+        <h2>API #3 Time cost test:</h2>
+        <form>
+            {% csrf_token %}
+            <input type="button" value="Test" id="3" class="test">
+            <br>
+            <p>Costs: <span id="cost3"></span>s</p>
+            <p>Costs: <span id="cost3_content"></span>s</p>
+            <br>
+        </form>
+    </div>
+
+    <script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+          $(".test").click(function(){
+            var sid = this.id
+            //alert(sid);
+            $.get("test/test",{'sid':sid}, function(ret){
+                //alert(ret);
+                console.log(ret)
+                if (sid == 1)
+                {
+                    console.log(ret)
+                    $('#cost1_time').html(ret.time);
+                    $('#cost1_content').html(ret.addr);
+                }
+                if (sid == 2)
+                {
+                    $('#cost2').html(ret.time);
+                    $('#cost2_content').html(ret.txid);
+
+                }
+                if (sid == 3)
+                {
+                    $('#cost3').html(ret.time);
+                    $('#cost3_content').html(ret.msg);
+
+                }
+            })
+          });
+        });
+    </script>
+</body>
+</html>

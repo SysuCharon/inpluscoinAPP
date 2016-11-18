@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'jquery-2.2.0.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+</head>
+<body>
+    <div class="container">
+        <br>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col-md-10">
+                <h4 style="vertical-align: top"><span>{{ user }}</span>, 您的誓言如下:</h4>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-default">
+                    <a href="{% url 'input' %}">新增誓言</a>
+                </button>
+            </div>
+        </div>
+        <br>
+
+        <table class="table table-striped table-bordered">
+            <thead>
+                <th class="col-md-3">编号</th>
+                <th class="col-md-6">在区块链的位置</th>
+                <th chass='col-md-6'>查看誓言</th>
+            </thead>
+            <tbody>
+                    {% for word in words %}
+                        <tr style="height: 50px">
+                        <td>{{ forloop.counter }}</td>
+                        <td id='word_{{ forloop.counter }}'>{{ word }}</td>
+                        <td><input type="button" id='get_{{ forloop.counter }}' name="txid" value="查看" class='get'></td>
+                        </tr>
+                        <tr id='content_{{ forloop.counter }}' display='none'></tr>
+                    {% endfor %}
+
+            </tbody>
+        </table>
+{#        <div class="row">#}
+{#            <div class="col-md-4 col-sm-4"></div>#}
+{#            <div class="col-md-2 col-sm-2">#}
+{#                <input class="btn btn-default" value="上一页" >#}
+{#            </div>#}
+{#            <div class="col-md-2 col-sm-2">#}
+{#                <input class="btn btn-default" value="下一页"  >#}
+{#            </div>#}
+{#            <div class="col-md-4 col-sm-4"></div>#}
+{#        </div>#}
+        <script type="text/javascript">
+            $(document).ready(function(){
+          $(".get").click(function(){
+            var temp = '#word_' + this.id.split('_')[1]
+            var txid = $(temp).html()
+            var content = '#content_' + this.id.split('_')[1]
+            // console.log(txid)
+            // console.log(content)
+            $(content).show()
+            $.get("/detail",{'txid':txid}, function(ret){
+                //alert(ret);
+                // console.log(ret)
+                text = "誓言为: " + ret
+                $(content).html(text);
+            })
+          });
+        });
+        </script>
+    </div>
+</body>
+</html>

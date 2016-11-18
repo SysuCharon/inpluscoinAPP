@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <script src="{% static 'jquery-2.2.0.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+</head>
+<body>
+<div class="container">
+    <br>
+    <br>
+    <br>
+    <h2 align="center">请输入您的誓言</h2>
+    <br>
+
+    <div class="col-md-3 col-sm-3" height="500px"></div>
+    <div class="col-md-6 col-sm-6" height="500px">
+        <form class="form" action="{% url 'input' %}" method="post">
+            {% csrf_token %}
+            <br>
+            <div class="row">
+                <textarea class="form-control" placeholder="不超过60个中文字符,或者120个英文字符" rows="5" name="word"></textarea>
+            </div>
+            <br>
+            <br>
+            <br>
+
+            <div class="row" align="center">
+                <input class="form-control" type="submit" value="提交" style="width:60px;font-weight: bold" >
+            </div>
+
+        </form>
+    </div>
+    <div class="col-md-3 col-sm-3" height="500px"></div>
+    <br>
+    <br>
+</div>
+</body>
+</html>
