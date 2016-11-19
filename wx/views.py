@@ -15,7 +15,7 @@ from OP_RETURN import OP_RETURN_getnewaddress
 from OP_RETURN import OP_RETURN_send
 from OP_RETURN import OP_RETURN_getmessage
 
-from .models import User, Content
+from .models import wxUser, wxContent
 from django.core.exceptions import ObjectDoesNotExist
 
 import xml.etree.ElementTree as ET
@@ -62,7 +62,7 @@ submenu = {}
 menustr = '回复1：进入注册\n回复2：新增誓言\n回复3：查看誓言列表'
 menu1 = '回复1：确认注册\n回复0：返回主菜单'
 menu2 = '回复誓言内容发誓\n回复0：返回主菜单'
-menu3 = '回复对应誓言数字查看具体誓言\n回复0：返回主菜单'
+menu3 = '回复对应誓言序号查看具体誓言\n回复0：返回主菜单'
 blockchain_error = '区块链错误\n回复0：返回主菜单'
 regist_error = '您尚未注册\n请按照提示注册'
 def responseMsg(request):
@@ -105,21 +105,21 @@ def menu(fromUser, content):
     submenu[fromUser] = 2
   elif content == '3':
     try:
-      user = User.objects.get(openID=fromUser)
-      txids = Content.objects.filter(user = user.id)
+      user = wxUser.objects.get(openID=fromUser)
+      txids = wxContent.objects.filter(user = user.id)
       count = txids.count()
-    except:
-      replyContent = regist_error
-    else:
       if count == 0:
         replyContent = '您未发誓'
       else:
         i = 1
+        string = ''
         for item in txids:
-          string =  str(i) + ' ' + item + '\n'
+          string +=  str(i) + ' ' + str(item) + '\n'
           i += 1
-        replyContent = '序号 誓言在区块链上的位置' + string + menu3
+        replyContent = '序号 誓言在区块链上的位置\n' + string + menu3
         submenu[fromUser] = 3
+    except:
+      replyContent = regist_error
   else:
     replyContent = '回复错误\n' + menustr
 
@@ -128,17 +128,20 @@ def menu(fromUser, content):
 def submenu1(fromUser, content):
   if content == '1':
     try:
-      user = User.objects.get(openID=fromUser)
+      user = wxUser.objects.get(openID=fromUser)
+      replyContent = '您已注册\n回复0：返回主菜单'
     except:
       try:
         address = OP_RETURN_getnewaddress()
+        # print 'ok'
+        print address
+        replyContent = '注册成功\n您在区块链上的地址为\n' + str(address)
+        # print '1'
+        addUser(fromUser, address)
+        # print '2'
+        print replyContent
       except:
         replyContent = blockchain_error
-      else:
-        addUser(fromUser, address)
-        replyContent = '注册成功\n您在区块链上的地址为\n' + address
-    else:
-      replyContent = '您已注册\n回复0：返回主菜单'
   elif content == '0':
     replyContent = menustr
     del submenu[fromUser]
@@ -152,17 +155,16 @@ def submenu2(fromUser, content):
     replyContent = menustr
   else:
     try:
-      user = User.objects.get(openID=fromUser)
-    except:
-      replyContent = regist_error
-    else:
+      user = wxUser.objects.get(openID=fromUser)
       address = getAddrByOpenID(fromUser)
       txid = OP_RETURN_send(address, 0.001, content)
       if txid.has_key('txid'):
-        addContent(address, txid['txid'])
+        addContent(fromUser, txid['txid'])
         replyContent = '发誓成功\n' + menustr
       else:
         replyContent = blockchain_error
+    except:
+      replyContent = regist_error
   del submenu[fromUser]
 
   return replyContent
@@ -174,15 +176,14 @@ def submenu3(fromUser, content):
   else:
     try:
       txid = getTxid(fromUser, content)
-    except:
-      replyContent = '输入错误，不存在的id，请重新输入'
-    else:
       try:
         text = OP_RETURN_getmessage(txid)
+        print text
+        replyContent = text
       except:
         replyContent = blockchain_error
-      else:
-        replyContent = text
+    except:
+      replyContent = '输入错误，不存在的id，请重新输入'
   return replyContent
 
 def wechatXML(fromUser, toUser, nowtime, msgType, replyContent):
@@ -191,29 +192,32 @@ def wechatXML(fromUser, toUser, nowtime, msgType, replyContent):
   return extTpl
 
 def addUser(openID, address):
-    user = User()
-    user.openID = openID
-    user.address = address
-    user.save()
+  # user = User()
+  # user.openID = openID
+  # user.address = address
+  # user.save()
+
+  user = wxUser.objects.create(openID= openID, address = address)
+  user.save()
 
 def addContent(openID, txid):
-    c = Content()
-    user = User.objects.get(openID = openID)
-    c.user = user
-    c.count = Content.objects.filter(user = user.id).count() + 1
-    c.txid = txid
-    c.save()
+  user = wxUser.objects.get(openID = openID)
+  count = wxContent.objects.filter(user = user.id).count() + 1
+  c = wxContent.objects.create(user = user, count = count, txid = txid)
+  # c.user = user
+  # c.txid = txid
+  c.save()
 
 def getAddrByOpenID(openID):
-    return User.objects.get(openID = openID).address
+  return wxUser.objects.get(openID = openID).address
 
 def getTxid(openID, count):
-  user = User.objects.get(openID = openID).id
-  return Content.objects.get(user = user, count = count).txid
+  user = wxUser.objects.get(openID = openID).id
+  return wxContent.objects.get(user = user, count = count).txid
 
 def getCount(openID):
-    user = User.objects.get(openID = openID)
-    return Content.objects.filter(user = user.id).count()
+  user = wxUser.objects.get(openID = openID)
+  return wxContent.objects.filter(user = user.id).count()
 
 
 
@@ -297,7 +301,7 @@ def Test(request):
         user = User.objects.get(openID = '4').id
         # print user
 
-        count = Content.objects.filter(user = user).count()
+        count = wxContent.objects.filter(user = user).count()
         txid = getTxid('4', count)
         print fun3(txid)
         # c = Content()
