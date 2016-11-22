@@ -61,7 +61,7 @@ submenu = {}
 
 menustr = '回复1：进入注册\n回复2：新增誓言\n回复3：查看誓言列表'
 menu1 = '回复1：确认注册\n回复0：返回主菜单'
-menu2 = '回复誓言内容发誓\n回复0：返回主菜单'
+menu2 = '回复誓言内容发誓\n誓言内容不能少于6个英文字母，不能超过60个汉字或120个英文\n回复0：返回主菜单'
 menu3 = '回复对应誓言序号查看具体誓言\n回复0：返回主菜单'
 blockchain_error = '区块链错误\n回复0：返回主菜单'
 regist_error = '您尚未注册\n请按照提示注册'
@@ -157,12 +157,18 @@ def submenu2(fromUser, content):
     try:
       user = wxUser.objects.get(openID=fromUser)
       address = getAddrByOpenID(fromUser)
-      txid = OP_RETURN_send(address, 0.001, content)
-      if txid.has_key('txid'):
-        addContent(fromUser, txid['txid'])
-        replyContent = '发誓成功\n' + menustr
-      else:
-        replyContent = blockchain_error
+      print address
+      print content
+      print len(content)
+      try:
+        txid = OP_RETURN_send(address, 0.001,content)
+        if txid.has_key('txid'):
+          addContent(fromUser, txid['txid'])
+          replyContent = '发誓成功\n' + menustr
+        else:
+          replyContent = blockchain_error
+      except:
+        replyContent = '输入内容过长'
     except:
       replyContent = regist_error
   del submenu[fromUser]
