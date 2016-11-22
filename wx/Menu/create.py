@@ -9,8 +9,8 @@ reload(sys)
 sys.setdefaultencoding('UTF-8')
 
 #to get access_token
-appid = ''
-secret = ''
+appid = 'wx2a7aa3771cf62e4a'
+secret = '57735b9cf4d44f710eaa662a983c2204'
 getToken = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='
 					+ appid + '&secret=' + secret
 f = urllib2.urlopen(getToken)
@@ -33,21 +33,21 @@ menus = '''{
 		"key":"RECALL"
 	},
 	{
-		"name":"关于"
+		"name":"关于",
 		"sub_button":[
 		{
-			"type":"click"，
-			"name":"功能介绍"，
+			"type":"click",
+			"name":"功能介绍",
 			"key":"INTRODUCTION"
 		},
 		{
-			"type":"click"，
-			"name":"开发团队"，
+			"type":"click",
+			"name":"开发团队",
 			"key":"TEAM"
-		}，
+		},
 		{
-			"type":"click"，
-			"name":"联系方式"，
+			"type":"click",
+			"name":"联系方式",
 			"key":"CONTACT"
 		}]
 	}]
