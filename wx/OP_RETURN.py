@@ -125,7 +125,8 @@ def OP_RETURN_getnewaddress(testnet=False):
                 return {'error': 'Please check Bitcoin Core is running and OP_RETURN_BITCOIN_* constants are set correctly'}
 	address=OP_RETURN_bitcoin_cmd('getnewaddress', testnet, '')
 	
-	print address
+	# print address
+	return address
 def OP_RETURN_store(data, testnet=False):
 	# Data is stored in OP_RETURNs within a series of chained transactions.
 	# If the OP_RETURN is followed by another output, the data continues in the transaction spending that output.

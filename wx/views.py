@@ -59,12 +59,13 @@ def checkSignature(request):
 
 submenu = {}
 
-menustr = '回复1：进入注册\n回复2：新增誓言\n回复3：查看誓言列表'
+menustr = '回复1：新增誓言\n回复2：查看誓言列表\n回复3：团队介绍'
 menu1 = '回复1：确认注册\n回复0：返回主菜单'
 menu2 = '回复誓言内容发誓\n誓言内容不能少于6个英文字母，不能超过60个汉字或120个英文\n回复0：返回主菜单'
 menu3 = '回复对应誓言序号查看具体誓言\n回复0：返回主菜单'
 blockchain_error = '区块链错误\n回复0：返回主菜单'
 regist_error = '您尚未注册\n请按照提示注册'
+
 def responseMsg(request):
   print request.body
   str_xml = ET.fromstring(request.body)
@@ -73,17 +74,24 @@ def responseMsg(request):
   fromUser = str_xml.find('FromUserName').text  #用户openid
   msgType = str_xml.find('MsgType').text
   nowtime = str(int(time.time()))
-  content = str_xml.find('Content').text
+  resMsgType = 'text'
+
+  if msgType == 'event':
+    mscontent = str_xml.find('Event').text
+    if mscontent == 'subscribe':
+      replyContent = submenu0(fromUser, '1')
+      responseContent = wechatXML(fromUser,toUser,nowtime,resMsgType,replyContent)
+      return responseContent+'\n'+menustr
 
 
   if msgType == 'text':
+    content = str_xml.find('Content').text
     if submenu.has_key(fromUser):
       if submenu[fromUser] == 1:
         replyContent = submenu1(fromUser, content)
 
       elif submenu[fromUser] == 2:
         replyContent = submenu2(fromUser, content)
-
       elif submenu[fromUser] == 3:
         replyContent = submenu3(fromUser, content)
     else:
@@ -91,19 +99,16 @@ def responseMsg(request):
       
   else:
     replyContent = '不支持非文本格式输入'
-  resMsgType = 'text'
+  
 
   responseContent = wechatXML(fromUser,toUser,nowtime,resMsgType,replyContent)
   return responseContent
 
 def menu(fromUser, content):
   if content == '1':
-    replyContent = menu1
+    replyContent = menu2
     submenu[fromUser] = 1
   elif content == '2':
-    replyContent = menu2
-    submenu[fromUser] = 2
-  elif content == '3':
     try:
       user = wxUser.objects.get(openID=fromUser)
       txids = wxContent.objects.filter(user = user.id)
@@ -117,15 +122,17 @@ def menu(fromUser, content):
           string +=  str(i) + ' ' + str(item) + '\n'
           i += 1
         replyContent = '序号 誓言在区块链上的位置\n' + string + menu3
-        submenu[fromUser] = 3
+        submenu[fromUser] = 2
     except:
       replyContent = regist_error
+  elif content == '3':
+    replyContent = '【InplusLab】\n导师：郑子彬\n成员：王晶、陈伟利、李阳、崔嘉辉、谢少安、马璐、谢智晖、郑沛霖、刘家豪、李友、马明杰'
   else:
     replyContent = '回复错误\n' + menustr
 
   return replyContent
 
-def submenu1(fromUser, content):
+def submenu0(fromUser, content):
   if content == '1':
     try:
       user = wxUser.objects.get(openID=fromUser)
@@ -135,6 +142,7 @@ def submenu1(fromUser, content):
         address = OP_RETURN_getnewaddress()
         # print 'ok'
         print address
+        print 'test'
         replyContent = '注册成功\n您在区块链上的地址为\n' + str(address)
         # print '1'
         addUser(fromUser, address)
@@ -150,7 +158,7 @@ def submenu1(fromUser, content):
 
   return replyContent
 
-def submenu2(fromUser, content):
+def submenu1(fromUser, content):
   if content == '0':
     replyContent = menustr
   else:
@@ -175,7 +183,7 @@ def submenu2(fromUser, content):
 
   return replyContent
 
-def submenu3(fromUser, content):
+def submenu2(fromUser, content):
   if content == '0':
     replyContent = menustr
     del submenu[fromUser]
